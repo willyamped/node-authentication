@@ -1,4 +1,5 @@
 const { models } = require("mongoose");
+const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 
@@ -6,13 +7,11 @@ const User = require('../models/User');
 const handleErrors = (err) => {
     console.log(err.message, err.code);
     let errors = {email: '', password: ''};
-
     // duplicate email needs to be handled separately
     if (err.code === 11000) {
         errors['email'] = 'that email is already registered';
         return errors
     }
-    
     // validation errors (we need this so that the message
     // from the model can get sent back to user as a response)
     if (err.message.includes('user validation failed')) {
@@ -21,6 +20,13 @@ const handleErrors = (err) => {
         })
     }
     return errors
+}
+
+const maxAge = 3 * 24 * 60 * 60; // in seconds not ms
+const createToken = (id) => {
+    return jwt.sign({id}, 'test secret', {
+        expiresIn: maxAge
+    });
 }
 
 module.exports.signup_get = (req, res) => {
@@ -36,7 +42,9 @@ module.exports.signup_post = async (req, res) => {
     try {
         // email and password are required in the schema
         const user = await User.create({ email, password });
-        res.status(201).json(user);
+        const token = createToken(user._id)
+        res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge * 1000}) // in ms
+        res.status(201).json({user: user._id});
     } catch (err) {
         const errors = handleErrors(err);
         res.status(400).json({errors});
