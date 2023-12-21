@@ -15,7 +15,6 @@ const handleErrors = (err) => {
     
     // validation errors (we need this so that the message
     // from the model can get sent back to user as a response)
-    
     if (err.message.includes('user validation failed')) {
         Object.values(err.errors).forEach(({properties}) => {
             errors[properties.path] = properties.message;
