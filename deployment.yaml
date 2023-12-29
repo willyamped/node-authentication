@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: node-auth-deployment
+  labels:
+    app: node-auth
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: node-auth
+  template:
+    metadata:
+      labels:
+        app: node-auth
+    spec:
+      containers:
+      - name: node-auth-server
+        image: willyamped/node-auth:linux
+        ports:
+        - containerPort: 3000
