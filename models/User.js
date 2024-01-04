@@ -17,7 +17,7 @@ const userSchema = new mongoose.Schema({
     },
 });
 
-// fire a fuction before doc saved to bd
+// fire a fuction before doc saved to db
 // this refers to current user
 // can only get reference to this by using {} not =>
 userSchema.pre('save', async function (next) {
